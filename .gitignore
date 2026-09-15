@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
 
 # Ferramentas locais de desenvolvimento (não fazem parte do produto)
 .claude/
