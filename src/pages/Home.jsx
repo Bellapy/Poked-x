@@ -2,10 +2,30 @@ import { useMemo, useState } from 'react'
 import { isRare } from '../api/pokemonTcg'
 import CardTile from '../components/CardTile'
 import HeroBanner from '../components/HeroBanner'
+import { ChevronDownIcon, SearchIcon } from '../components/icons'
 import { shuffle } from '../lib/shuffle'
 import { useCards } from '../lib/useCards'
 
 const ALL = 'Todos'
+
+function Select({ value, onChange, options }) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={onChange}
+        className="appearance-none rounded-full border border-arcade-panel-light bg-arcade-panel py-2 pl-4 pr-9 text-sm text-ink focus-visible:ring-2 focus-visible:ring-glow-rare"
+      >
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <ChevronDownIcon className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+    </div>
+  )
+}
 
 export default function Home() {
   const { cards, status, error } = useCards()
@@ -40,79 +60,69 @@ export default function Home() {
   })
 
   if (status === 'loading') {
-    return <div className="p-6 text-white/50">Carregando cartas...</div>
+    return (
+      <div className="flex h-[60vh] items-center justify-center text-ink-muted">
+        Ligando a máquina...
+      </div>
+    )
   }
 
   if (status === 'error') {
-    return <div className="p-6 text-pokedex-red">Erro ao carregar cartas: {error}</div>
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center gap-2 text-center">
+        <p className="text-glow-common">A máquina travou ao buscar as cartas.</p>
+        <p className="text-sm text-ink-muted">{error}</p>
+      </div>
+    )
   }
 
   return (
-    <div className="p-6">
+    <div className="mx-auto max-w-6xl p-6">
       <HeroBanner highlightCards={highlights} />
 
-      <section className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Cartas em destaque</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-10 gap-3">
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold text-ink">Vitrines em destaque</h2>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-10">
           {highlights.map((card) => (
             <CardTile key={card.id} card={card} />
           ))}
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Buscar cartas</h2>
+      <section className="mt-12">
+        <h2 className="text-2xl font-bold text-ink">Procurar cartas</h2>
 
-        <div className="flex flex-wrap gap-3 mb-6">
-          <input
-            type="text"
-            placeholder="Buscar por nome..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-white/10 rounded px-3 py-2 flex-1 min-w-[200px]"
-          />
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="bg-white/10 rounded px-3 py-2"
-          >
-            {types.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-          <select
-            value={set}
-            onChange={(e) => setSet(e.target.value)}
-            className="bg-white/10 rounded px-3 py-2"
-          >
-            {sets.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-          <select
-            value={rarity}
-            onChange={(e) => setRarity(e.target.value)}
-            className="bg-white/10 rounded px-3 py-2"
-          >
-            {rarities.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <div className="relative min-w-[220px] flex-1">
+            <SearchIcon className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-muted" />
+            <input
+              type="text"
+              placeholder="Buscar por nome..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-full border border-arcade-panel-light bg-arcade-panel py-2 pl-11 pr-4 text-sm text-ink placeholder:text-ink-muted focus-visible:ring-2 focus-visible:ring-glow-rare"
+            />
+          </div>
+          <Select value={type} onChange={(e) => setType(e.target.value)} options={types} />
+          <Select value={set} onChange={(e) => setSet(e.target.value)} options={sets} />
+          <Select value={rarity} onChange={(e) => setRarity(e.target.value)} options={rarities} />
         </div>
 
-        <p className="text-white/40 text-sm mb-4">{filtered.length} carta(s) encontrada(s)</p>
+        <p className="mt-4 font-mono-tabular text-xs text-ink-muted">
+          {filtered.length} carta(s) na vitrine
+        </p>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-          {filtered.slice(0, 60).map((card) => (
-            <CardTile key={card.id} card={card} />
-          ))}
-        </div>
+        {filtered.length === 0 ? (
+          <p className="mt-10 text-center text-ink-muted">
+            Nenhuma carta acendeu com esses filtros — tente outra combinação.
+          </p>
+        ) : (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
+            {filtered.slice(0, 60).map((card) => (
+              <CardTile key={card.id} card={card} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   )

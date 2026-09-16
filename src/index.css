@@ -1,11 +1,68 @@
 @import "tailwindcss";
 
 @theme {
-  --color-pokedex-red: #ef4444;
-  --color-pokedex-blue: #3b82f6;
-  --color-pokedex-dark: #0f0f1a;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "Space Mono", monospace;
+
+  --color-arcade-bg: #0d0e13;
+  --color-arcade-panel: #23262f;
+  --color-arcade-panel-light: #363a46;
+  --color-ink: #f4f3f0;
+  --color-ink-muted: #9b98ac;
+
+  --color-glow-common: #f2a33d;
+  --color-glow-rare: #3ddbe0;
+  --color-glow-ultra-a: #ff6ad5;
+  --color-glow-ultra-b: #7c8cff;
 }
 
 body {
-  @apply bg-pokedex-dark text-white antialiased;
+  background-color: var(--color-arcade-bg);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+}
+
+::selection {
+  background-color: var(--color-glow-rare);
+  color: var(--color-arcade-bg);
+}
+
+* {
+  scrollbar-color: var(--color-arcade-panel-light) var(--color-arcade-bg);
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-arcade-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-arcade-panel-light);
+  border-radius: 999px;
+  border: 2px solid var(--color-arcade-bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-glow-rare);
+  outline-offset: 2px;
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.holo-glow {
+  background-image: conic-gradient(
+    from 0deg,
+    var(--color-glow-ultra-a),
+    var(--color-glow-rare),
+    var(--color-glow-ultra-b),
+    var(--color-glow-ultra-a)
+  );
 }

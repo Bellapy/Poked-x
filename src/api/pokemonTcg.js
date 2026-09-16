@@ -12,6 +12,10 @@ const API_KEY = import.meta.env.VITE_POKEMON_TCG_API_KEY
 // Rarezas consideradas "comuns" — qualquer outra conta como rara para os destaques.
 const COMMON_RARITIES = new Set(['Common', 'Uncommon'])
 
+// Rarezas de topo — ganham o brilho holográfico especial da vitrine (é o
+// "efeito raro de verdade", por isso fica restrito a poucas rarezas).
+const ULTRA_KEYWORDS = ['secret', 'rainbow', 'ultra', 'hyper', 'amazing', 'gold', 'shiny']
+
 async function fetchWithRetry(url, { retries = 2, delayMs = 500 } = {}) {
   const headers = API_KEY ? { 'X-Api-Key': API_KEY } : undefined
 
@@ -56,4 +60,13 @@ export async function getCardById(id) {
 
 export function isRare(card) {
   return !COMMON_RARITIES.has(card.rarity)
+}
+
+// Vitrine da carta na home: cor do brilho por trás dela, por raridade.
+export function getRarityTier(card) {
+  const rarity = card.rarity ?? ''
+  if (COMMON_RARITIES.has(rarity)) return 'common'
+  const normalized = rarity.toLowerCase()
+  if (ULTRA_KEYWORDS.some((keyword) => normalized.includes(keyword))) return 'ultra'
+  return 'rare'
 }
