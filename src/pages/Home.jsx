@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { isRare } from '../api/pokemonTcg'
 import CardTile from '../components/CardTile'
+import HeroBanner from '../components/HeroBanner'
 import { shuffle } from '../lib/shuffle'
 import { useCards } from '../lib/useCards'
 
@@ -48,9 +49,7 @@ export default function Home() {
 
   return (
     <div className="p-6">
-      <section className="h-80 rounded-2xl bg-gradient-to-br from-pokedex-red/40 to-pokedex-blue/40 flex items-center justify-center text-white/70">
-        Banner 3D — em construção
-      </section>
+      <HeroBanner highlightCards={highlights} />
 
       <section className="mt-10">
         <h2 className="text-2xl font-bold mb-4">Cartas em destaque</h2>
