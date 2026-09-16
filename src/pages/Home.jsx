@@ -3,6 +3,7 @@ import { isRare } from '../api/pokemonTcg'
 import CardTile from '../components/CardTile'
 import HeroBanner from '../components/HeroBanner'
 import { ChevronDownIcon, SearchIcon } from '../components/icons'
+import RareCardsCarousel from '../components/RareCardsCarousel'
 import { shuffle } from '../lib/shuffle'
 import { useCards } from '../lib/useCards'
 
@@ -81,11 +82,9 @@ export default function Home() {
       <HeroBanner highlightCards={highlights} />
 
       <section className="mt-12">
-        <h2 className="text-2xl font-bold text-ink">Vitrines em destaque</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-10">
-          {highlights.map((card) => (
-            <CardTile key={card.id} card={card} />
-          ))}
+        <h2 className="text-2xl font-bold text-ink">Roleta de cartas raras</h2>
+        <div className="mt-4">
+          <RareCardsCarousel cards={highlights} />
         </div>
       </section>
 
