@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import IntroAnimation from './components/IntroAnimation'
 import Navbar from './components/Navbar'
 import PokeballCursor from './components/PokeballCursor'
 import Footer from './components/Footer'
@@ -35,6 +36,7 @@ export default function App() {
     <AuthProvider>
       <CardsProvider>
         <CartProvider>
+          <IntroAnimation />
           <PokeballCursor />
           <BrowserRouter>
             <Routes>
