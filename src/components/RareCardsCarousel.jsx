@@ -62,7 +62,7 @@ function CarouselCard({ card, offset, dragging }) {
         }}
       >
         <HoloCard
-          src={card.images.large ?? card.images.small}
+          src={card.images.small ?? card.images.large}
           alt={card.name}
           restOpacity={isFocused ? 0.45 : 0}
         />

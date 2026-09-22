@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { getArtworkUrl, modelExists } from '../api/pokemon3d'
+import { getArtworkUrl } from '../api/pokemon3d'
 
 // Elenco fixo do banner: Pokémon famosos e visualmente marcantes. Antes a lista
 // saía das cartas em destaque, o que trazia Pokémon obscuros e modelos feios.
@@ -97,34 +96,15 @@ const BANNER_POKEMON = [
   },
 ]
 
-// A cobertura da Pokemon3D API é parcial, então cada modelo é confirmado antes
-// de entrar no elenco — um .glb faltando tiraria o Pokémon do ar no meio do loop.
+// Os 11 modelos deste elenco foram conferidos manualmente, então o banner não
+// gasta mais uma rodada de requisições HEAD confirmando que cada .glb existe --
+// eram 11 idas à rede bloqueando o banner antes dele sequer aparecer. Se algum
+// modelo cair, o ErrorBoundary do ator remove aquele Pokémon sem quebrar o loop.
+const SLIDES = BANNER_POKEMON.map((pokemon) => ({
+  ...pokemon,
+  artworkUrl: getArtworkUrl(pokemon.dexId),
+}))
+
 export function useBannerPokemon() {
-  const [slides, setSlides] = useState([])
-  const [status, setStatus] = useState('loading')
-
-  useEffect(() => {
-    let cancelled = false
-
-    Promise.all(
-      BANNER_POKEMON.map(async (pokemon) => ({
-        ...pokemon,
-        hasModel: await modelExists(pokemon.dexId),
-      })),
-    ).then((results) => {
-      if (cancelled) return
-      setSlides(
-        results
-          .filter((p) => p.hasModel)
-          .map((p) => ({ ...p, artworkUrl: getArtworkUrl(p.dexId) })),
-      )
-      setStatus('ready')
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { slides, status }
+  return { slides: SLIDES, status: 'ready' }
 }

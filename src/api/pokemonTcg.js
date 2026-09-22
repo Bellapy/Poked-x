@@ -6,6 +6,11 @@
 import { KEYS, readJSON, writeJSON } from '../lib/storage'
 
 const BASE_URL = 'https://api.pokemontcg.io/v2'
+
+// Só os campos que o app realmente consome. O payload padrão traz ataques,
+// regras, legalidades, textos de sabor e histórico de preços de cada carta —
+// peso morto que atrasa o primeiro carregamento em conexão lenta.
+const FIELDS = ['id', 'name', 'rarity', 'types', 'number', 'images', 'set', 'cardmarket', 'tcgplayer']
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24 // 24h
 const API_KEY = import.meta.env.VITE_POKEMON_TCG_API_KEY
 
@@ -26,7 +31,9 @@ export async function getCards({ pageSize = 250 } = {}) {
 
   if (isFresh) return cache.cards
 
-  const res = await fetchWithRetry(`${BASE_URL}/cards?pageSize=${pageSize}`)
+  const res = await fetchWithRetry(
+    `${BASE_URL}/cards?pageSize=${pageSize}&select=${FIELDS.join(',')}`,
+  )
   if (!res.ok) {
     // Se a API falhar e ainda houver cache (mesmo expirado), usa como fallback.
     if (cache) return cache.cards

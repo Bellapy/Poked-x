@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
+import { lazy, Suspense } from 'react'
 import Button from '../components/Button'
-import HeroBanner from '../components/HeroBanner'
 import { ChevronDownIcon, PlusIcon, SearchIcon } from '../components/icons'
 import ListingTile from '../components/ListingTile'
 import RareCardsCarousel from '../components/RareCardsCarousel'
@@ -9,6 +9,11 @@ import { useCards } from '../context/CardsContext'
 import { isRare } from '../lib/cardRarity'
 import { CONDITIONS, getCollection, getListings, isForSale, isForTrade } from '../lib/market'
 import { shuffle } from '../lib/shuffle'
+
+// O banner arrasta o three.js junto, que sozinho é a maior parte do bundle.
+// Carregando sob demanda, o mercado aparece sem esperar por ele -- diferença
+// enorme em conexão lenta.
+const HeroBanner = lazy(() => import('../components/HeroBanner'))
 
 const ALL = 'Todos'
 
@@ -111,7 +116,9 @@ export default function Home() {
 
   return (
     <div>
-      <HeroBanner />
+      <Suspense fallback={<div className="h-[52vh] max-h-[560px] min-h-[380px] w-full" />}>
+        <HeroBanner />
+      </Suspense>
 
       <section className="w-full">
         <RareCardsCarousel cards={highlights} />

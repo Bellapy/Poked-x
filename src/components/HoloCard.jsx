@@ -73,7 +73,14 @@ export default function HoloCard({ src, alt, className = '', restOpacity = 0 }) 
       onPointerLeave={handlePointerLeave}
     >
       <div className="holo__rotator">
-        <img className="holo__img" src={src} alt={alt} draggable={false} />
+        <img
+          className="holo__img"
+          src={src}
+          alt={alt}
+          draggable={false}
+          loading="lazy"
+          decoding="async"
+        />
         <div className="holo__shine" />
         <div className="holo__glare" />
       </div>

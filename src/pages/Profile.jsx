@@ -235,7 +235,7 @@ function CollectionTab({ items, listedItemIds, getCard }) {
           <div key={item.id} className="group">
             {card && (
               <img
-                src={card.images.large ?? card.images.small}
+                src={card.images.small ?? card.images.large}
                 alt={card.name}
                 loading="lazy"
                 className="w-full transition-transform duration-500 ease-out group-hover:-translate-y-2"
