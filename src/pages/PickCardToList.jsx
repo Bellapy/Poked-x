@@ -87,7 +87,7 @@ export default function PickCardToList() {
                   <Link to={nextUrl(item.id)} className="group block">
                     {card && (
                       <img
-                        src={card.images.large ?? card.images.small}
+                        src={card.images.small ?? card.images.large}
                         alt={card.name}
                         loading="lazy"
                         className="w-full transition-transform duration-500 ease-out group-hover:-translate-y-3"

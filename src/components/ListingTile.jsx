@@ -29,7 +29,12 @@ export default function ListingTile({
   if (!card) return null
 
   const tier = TIER[getRarityTier(card)]
-  const image = card.images.large ?? card.images.small
+
+  // Imagem pequena (~157 KB) e não a grande (~825 KB): numa vitrine com quase
+  // cem cartas a diferença é de dezenas de megabytes, e nesse tamanho de
+  // exibição a resolução maior não aparece. A grande fica só onde a carta
+  // ocupa a tela, nos detalhes.
+  const image = card.images.small ?? card.images.large
 
   return (
     <div className="group relative">
