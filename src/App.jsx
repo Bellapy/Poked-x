@@ -1,7 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import IntroAnimation from './components/IntroAnimation'
+import Navbar from './components/Navbar'
+import PokeballCursor from './components/PokeballCursor'
 import RequireAuth from './components/RequireAuth'
+import ScrollToTop from './components/ScrollToTop'
+import TypingSparkles from './components/TypingSparkles'
 import { AuthProvider } from './context/AuthContext'
 import { CardsProvider } from './context/CardsContext'
 import { CartProvider } from './context/CartContext'
@@ -34,7 +38,11 @@ export default function App() {
     <AuthProvider>
       <CardsProvider>
         <CartProvider>
+          <IntroAnimation />
+          <PokeballCursor />
+          <TypingSparkles />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<Register />} />
