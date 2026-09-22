@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import PokeballCursor from './components/PokeballCursor'
 import Footer from './components/Footer'
 import RequireAuth from './components/RequireAuth'
 import { AuthProvider } from './context/AuthContext'
@@ -34,6 +35,7 @@ export default function App() {
     <AuthProvider>
       <CardsProvider>
         <CartProvider>
+          <PokeballCursor />
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />

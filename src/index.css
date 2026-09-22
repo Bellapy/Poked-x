@@ -98,6 +98,53 @@ body::before {
   font-variant-numeric: tabular-nums;
 }
 
+/* ===========================================================================
+   Cursor de pokébola
+
+   Duas camadas independentes seguindo o ponteiro com velocidades diferentes: a
+   bola quase cola no mouse, o halo fica para trás e cria o rastro. As posições
+   são escritas via style.transform num loop de requestAnimationFrame, nunca por
+   estado do React — um re-render por movimento do mouse derrubaria o frame rate.
+   =========================================================================== */
+
+.has-pokeball-cursor,
+.has-pokeball-cursor * {
+  cursor: none;
+}
+
+.pokeball-cursor,
+.pokeball-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+  transition: opacity 0.25s ease;
+}
+
+.pokeball-cursor {
+  z-index: 10000;
+  filter: drop-shadow(0 4px 10px rgb(0 0 0 / 0.5));
+}
+
+.pokeball-cursor-ring {
+  z-index: 9999;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid hsl(322 90% 70% / 0.55);
+  background: radial-gradient(circle, hsl(322 90% 60% / 0.18), transparent 70%);
+  box-shadow: 0 0 22px hsl(322 90% 60% / 0.35);
+}
+
+/* Para quem pediu menos movimento, fica só a bola — sem rastro. */
+@media (prefers-reduced-motion: reduce) {
+  .pokeball-cursor-ring {
+    display: none;
+  }
+}
+
 .glass {
   background: hsl(268 45% 13% / 0.42);
   backdrop-filter: blur(18px) saturate(1.3);
