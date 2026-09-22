@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import RequireAuth from './components/RequireAuth'
 import { AuthProvider } from './context/AuthContext'
 import { CardsProvider } from './context/CardsContext'
@@ -22,6 +23,7 @@ function Protected({ children, adminOnly }) {
       <div className="flex min-h-screen flex-col">
         <Navbar />
         <main className="flex-1">{children}</main>
+        <Footer />
       </div>
     </RequireAuth>
   )

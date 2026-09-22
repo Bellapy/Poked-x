@@ -4,31 +4,71 @@
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "Space Mono", monospace;
 
-  --color-arcade-bg: #0d0e13;
-  --color-arcade-panel: #23262f;
-  --color-arcade-panel-light: #363a46;
-  --color-ink: #f4f3f0;
-  --color-ink-muted: #9b98ac;
+  --color-arcade-bg: #08050f;
+  /* Painéis translúcidos: o fundo global precisa atravessar todo card e barra,
+     senão voltam as "caixas" com borda dura que o redesign removeu. */
+  --color-arcade-panel: hsl(268 45% 13% / 0.55);
+  --color-arcade-panel-light: hsl(280 60% 75% / 0.16);
+  --color-ink: #f6f2ff;
+  --color-ink-muted: #a99dc4;
 
-  --color-glow-common: #f2a33d;
-  --color-glow-rare: #3ddbe0;
-  --color-glow-ultra-a: #ff6ad5;
-  --color-glow-ultra-b: #7c8cff;
+  --color-glow-common: #ff8a3d;
+  --color-glow-rare: #4cc9f0;
+  --color-glow-ultra-a: #ff5dcd;
+  --color-glow-ultra-b: #8b7bff;
+
+  --color-ember: #ff6b2c;
+  --color-magenta: #e0249c;
+}
+
+html {
+  background-color: var(--color-arcade-bg);
 }
 
 body {
-  background-color: var(--color-arcade-bg);
+  min-height: 100vh;
   color: var(--color-ink);
   font-family: var(--font-display);
+
+  /* Aurora de fundo: várias manchas radiais amplas com bordas totalmente
+     esfumadas. "fixed" mantém a composição parada enquanto a página rola. */
+  background-color: var(--color-arcade-bg);
+  background-image:
+    radial-gradient(58% 42% at 18% 10%, hsl(318 85% 48% / 0.55), transparent 70%),
+    radial-gradient(42% 34% at 70% 6%, hsl(24 96% 55% / 0.5), transparent 68%),
+    radial-gradient(52% 40% at 90% 26%, hsl(282 82% 48% / 0.42), transparent 70%),
+    radial-gradient(68% 52% at 6% 52%, hsl(258 78% 42% / 0.46), transparent 72%),
+    radial-gradient(46% 38% at 78% 58%, hsl(268 70% 38% / 0.4), transparent 70%),
+    radial-gradient(52% 40% at 42% 86%, hsl(340 88% 46% / 0.4), transparent 70%),
+    radial-gradient(44% 34% at 88% 92%, hsl(20 92% 52% / 0.32), transparent 68%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* Granulado por cima da aurora e por baixo do conteúdo: é o que tira o aspecto
+   de degradê digital liso e aproxima da referência. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+#root {
+  position: relative;
+  z-index: 1;
 }
 
 ::selection {
-  background-color: var(--color-glow-rare);
+  background-color: var(--color-glow-ultra-a);
   color: var(--color-arcade-bg);
 }
 
 * {
-  scrollbar-color: var(--color-arcade-panel-light) var(--color-arcade-bg);
+  scrollbar-color: hsl(280 40% 60% / 0.35) transparent;
   scrollbar-width: thin;
 }
 
@@ -38,17 +78,18 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-arcade-bg);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-arcade-panel-light);
+  background-color: hsl(280 40% 60% / 0.35);
   border-radius: 999px;
-  border: 2px solid var(--color-arcade-bg);
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-glow-rare);
+  outline: 2px solid var(--color-glow-ultra-a);
   outline-offset: 2px;
 }
 
@@ -57,12 +98,168 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.holo-glow {
-  background-image: conic-gradient(
-    from 0deg,
-    var(--color-glow-ultra-a),
-    var(--color-glow-rare),
-    var(--color-glow-ultra-b),
-    var(--color-glow-ultra-a)
+.glass {
+  background: hsl(268 45% 13% / 0.42);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+}
+
+.text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-glow-common),
+    var(--color-magenta) 45%,
+    var(--color-glow-ultra-b)
   );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ===========================================================================
+   Efeito holográfico "rainbow"
+
+   Portado da técnica de simeydotme/pokemon-cards-css (a mesma que o
+   pokemoncardeffects.com usa). A carta é uma pilha de camadas em grid:
+
+     .holo__rotator  → inclinação 3D
+       img           → arte da carta
+       .holo__shine  → gradientes arco-íris + glitter (color-dodge)
+       .holo__glare  → brilho especular que segue o cursor (hard-light)
+
+   Tudo é dirigido por custom properties (--pointer-*) escritas direto no
+   style do nó durante o pointermove, sem passar pelo React — com várias
+   cartas na tela, um setState por movimento do mouse derrubaria o frame rate.
+   =========================================================================== */
+
+.holo {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --pointer-from-center: 0;
+  --pointer-from-left: 0.5;
+  --pointer-from-top: 0.5;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --card-opacity: 0;
+  --holo-radius: 4.55% / 3.5%;
+  --glittersize: 22%;
+
+  /* Textura de glitter gerada como SVG, para não depender de um PNG externo. */
+  --glitter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='9'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1 0 0 0 -0.62'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+
+  --r-clr-1: hsl(0, 57%, 37%);
+  --r-clr-2: hsl(40, 53%, 39%);
+  --r-clr-3: hsl(90, 60%, 35%);
+  --r-clr-4: hsl(180, 60%, 35%);
+  --r-clr-5: hsl(180, 60%, 35%);
+  --r-clr-6: hsl(210, 57%, 39%);
+  --r-clr-7: hsl(280, 55%, 31%);
+
+  perspective: 700px;
+  transform-style: preserve-3d;
+}
+
+.holo__rotator {
+  display: grid;
+  border-radius: var(--holo-radius);
+  overflow: hidden;
+  transform: rotateY(var(--rotate-x)) rotateX(var(--rotate-y));
+  transform-style: preserve-3d;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform;
+}
+
+/* Durante o movimento do cursor a inclinação precisa ser imediata; a transição
+   só existe para suavizar a entrada e a volta ao repouso. */
+.holo--interacting .holo__rotator {
+  transition: none;
+}
+
+.holo__rotator > * {
+  grid-area: 1 / 1;
+  width: 100%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+}
+
+.holo__img {
+  display: block;
+  height: auto;
+  transform: translate3d(0, 0, 0.01px);
+}
+
+.holo__shine,
+.holo__glare {
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.holo__shine {
+  display: grid;
+  z-index: 3;
+  transform: translateZ(1px);
+  opacity: var(--card-opacity);
+  mix-blend-mode: color-dodge;
+
+  background-image:
+    linear-gradient(-45deg, var(--r-clr-1), var(--r-clr-5)),
+    var(--glitter),
+    linear-gradient(
+      -30deg,
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4),
+      var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4),
+      var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4),
+      var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1)
+    );
+  background-blend-mode: luminosity, soft-light;
+  background-size: 200% 200%, var(--glittersize) var(--glittersize), 400% 400%;
+  background-position:
+    calc(25% + (50% * var(--pointer-from-left))) calc(25% + (50% * var(--pointer-from-top))),
+    center center,
+    calc(25% + (var(--pointer-x) / 2)) calc(25% + (var(--pointer-y) / 2));
+  filter: brightness(calc((var(--pointer-from-center) * 0.25) + 0.6)) contrast(2.2) saturate(0.75);
+}
+
+/* Segunda camada de arco-íris, em ângulo oposto e presa ao cursor: é o que dá a
+   sensação de duas folhas de foil deslizando uma sobre a outra. */
+.holo__shine::after {
+  content: "";
+  grid-area: 1 / 1;
+  border-radius: var(--holo-radius);
+  transform: translateZ(1.2px);
+  background-image:
+    var(--glitter),
+    linear-gradient(
+      -60deg,
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4),
+      var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4),
+      var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4),
+      var(--r-clr-5), var(--r-clr-6), var(--r-clr-7),
+      var(--r-clr-1)
+    );
+  background-blend-mode: soft-light;
+  background-size: var(--glittersize) var(--glittersize), 400% 400%;
+  background-position: center center, var(--pointer-x) var(--pointer-y);
+  filter: brightness(calc((var(--pointer-from-center) * 0.3) + 0.55)) contrast(2) saturate(1);
+  mix-blend-mode: color-dodge;
+}
+
+.holo__glare {
+  z-index: 4;
+  transform: translateZ(1.41px);
+  overflow: hidden;
+  background-image: radial-gradient(
+    farthest-corner circle at var(--pointer-x) var(--pointer-y),
+    hsl(0, 0%, 80%),
+    hsla(187, 10%, 85%, 0.25) 30%,
+    hsl(197, 6%, 25%) 120%
+  );
+  filter: brightness(0.9) contrast(1.75);
+  opacity: calc(var(--pointer-from-center) * 0.9 * var(--card-opacity));
+  mix-blend-mode: hard-light;
 }
