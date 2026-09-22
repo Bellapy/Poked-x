@@ -4,6 +4,7 @@ import Navbar from './components/Navbar'
 import PokeballCursor from './components/PokeballCursor'
 import Footer from './components/Footer'
 import RequireAuth from './components/RequireAuth'
+import TypingSparkles from './components/TypingSparkles'
 import { AuthProvider } from './context/AuthContext'
 import { CardsProvider } from './context/CardsContext'
 import { CartProvider } from './context/CartContext'
@@ -38,6 +39,7 @@ export default function App() {
         <CartProvider>
           <IntroAnimation />
           <PokeballCursor />
+          <TypingSparkles />
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />

@@ -145,6 +145,51 @@ body::before {
   }
 }
 
+/* ===========================================================================
+   Efeito de digitação
+
+   Faíscas partindo do cursor de texto + um brilho que pulsa no campo. As
+   partículas são criadas pelo TypingSparkles e vivem nesta camada, fora do
+   fluxo, para não deslocarem nada da página.
+   =========================================================================== */
+
+.type-spark-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+}
+
+.type-spark {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  will-change: transform, opacity;
+}
+
+input.is-typing,
+textarea.is-typing {
+  animation: typing-glow 0.55s ease-out;
+}
+
+@keyframes typing-glow {
+  0% {
+    box-shadow: 0 0 0 0 hsl(322 90% 62% / 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 9px hsl(322 90% 62% / 0);
+  }
+}
+
+/* Campo em foco ganha um contorno da paleta, para o efeito ter onde acontecer. */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: hsl(322 90% 65% / 0.55);
+  box-shadow: 0 0 26px -6px hsl(322 90% 60% / 0.5);
+}
+
 .glass {
   background: hsl(268 45% 13% / 0.42);
   backdrop-filter: blur(18px) saturate(1.3);
