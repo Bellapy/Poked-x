@@ -1,22 +1,26 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { KEYS, readJSON, writeJSON } from '../lib/storage'
-import { ensureSeed } from '../lib/seed'
 
 const AuthContext = createContext(null)
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+const INITIAL_BALANCE = 1000
 
-  useEffect(() => {
-    ensureSeed()
-    const session = readJSON(KEYS.session, { userId: null })
-    if (session.userId) {
-      const users = readJSON(KEYS.users, [])
-      setUser(users.find((u) => u.id === session.userId) ?? null)
-    }
+function loadSessionUser() {
+  const { userId } = readJSON(KEYS.session, { userId: null })
+  if (!userId) return null
+  return readJSON(KEYS.users, []).find((u) => u.id === userId) ?? null
+}
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(loadSessionUser)
+
+  // O `user` em memória é uma cópia: qualquer operação de mercado que mexa em
+  // saldo/coleção precisa chamar isto para a interface não mostrar dado velho.
+  const refreshUser = useCallback(() => {
+    setUser(loadSessionUser())
   }, [])
 
-  function login(email, password) {
+  const login = useCallback((email, password) => {
     const users = readJSON(KEYS.users, [])
     const found = users.find((u) => u.email === email && u.password === password)
     if (!found) return { ok: false, error: 'E-mail ou senha inválidos.' }
@@ -25,9 +29,9 @@ export function AuthProvider({ children }) {
     writeJSON(KEYS.session, { userId: found.id })
     setUser(found)
     return { ok: true }
-  }
+  }, [])
 
-  function register({ name, email, password }) {
+  const register = useCallback(({ name, email, password }) => {
     const users = readJSON(KEYS.users, [])
     if (users.some((u) => u.email === email)) {
       return { ok: false, error: 'Já existe uma conta com esse e-mail.' }
@@ -39,7 +43,7 @@ export function AuthProvider({ children }) {
       email,
       password,
       role: 'user',
-      balance: 1000,
+      balance: INITIAL_BALANCE,
       status: 'active',
       createdAt: new Date().toISOString(),
     }
@@ -48,18 +52,19 @@ export function AuthProvider({ children }) {
     writeJSON(KEYS.session, { userId: newUser.id })
     setUser(newUser)
     return { ok: true }
-  }
+  }, [])
 
-  function logout() {
+  const logout = useCallback(() => {
     writeJSON(KEYS.session, { userId: null })
     setUser(null)
-  }
+  }, [])
 
-  return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ user, login, register, logout, refreshUser }),
+    [user, login, register, logout, refreshUser],
   )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
